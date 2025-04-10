@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAR Demo</title>
+
+    <!-- Include A-Frame and AR.js -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+
+    <style>
+        /* Instructions UI */
+        #instructions {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: sans-serif;
+            font-size: 14px;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden;">
+
+    <!-- Instructions UI -->
+    <div id="instructions">
+        ✅ Point your camera at the marker to see the 3D object<br />
+        🌀 It will rotate!<br />
+        📱 Works on mobile Chrome/Safari<br />
+        🖱 Click on the object to change its color!
+    </div>
+
+    <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: true;">
+        <!-- Custom Marker -->
+        <!-- Replace 'assets/custom-marker.patt' with your marker pattern file path -->
+        <a-marker type="pattern" url="assets/custom-marker.patt">
+            <!-- 3D object (box) that will rotate -->
+            <a-box id="box" position="0 0.5 0" rotation="0 0 0" color="tomato"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 3000"
+                onclick="this.setAttribute('color', 'blue');">
+            </a-box>
+        </a-marker>
+
+        <!-- Camera setup -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
+</body>
+</html>
