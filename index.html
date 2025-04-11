@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebAR Demo with Hand Tracking</title>
+    <title>WebAR Demo</title>
 
     <!-- Include A-Frame and AR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
-    
-    <!-- MediaPipe Hand Tracking -->
-    <script src="https://cdn.jsdelivr.net/gh/google/mediapipe/mediapipe/handtracking/handtracking.js"></script>
 
     <style>
         /* Instructions UI */
@@ -31,63 +28,34 @@
 
     <!-- Instructions UI -->
     <div id="instructions">
-        ✅ Point your hand to make the 3D object appear.<br />
-        🖱 Click on the object to interact!
+        ✅ Point your camera at the marker to see the 3D object<br />
+        🌀 It will rotate!<br />
+        📱 Works on mobile Chrome/Safari<br />
+        🖱 Click on the object to change its color!
     </div>
 
     <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: true;">
-        <!-- Marker or 3D object -->
-        <a-entity id="hand-entity" visible="false" position="0 0 0">
-            <!-- 3D object (box) that will appear when hand is detected -->
-            <a-box color="tomato" position="0 0 0" scale="0.2 0.2 0.2"></a-box>
-        </a-entity>
+        <!-- Custom Marker -->
+        <a-marker type="pattern" url="https://raghadelajab.github.io/webAR/ARCODE.patt">
+            <!-- 3D object (box) that will rotate -->
+            <a-box id="box" position="0 0.5 0" rotation="0 0 0" color="tomato"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 3000">
+            </a-box>
+        </a-marker>
 
         <!-- Camera setup -->
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        // Initialize MediaPipe Hand Tracking
-        const handTracking = new HandTracking.Hands({
-            locateFile: (file) => `https://cdn.jsdelivr.net/gh/google/mediapipe/mediapipe/${file}`
-        });
+        // Select the box element by ID
+        const box = document.querySelector('#box');
 
-        handTracking.setOptions({
-            maxNumHands: 1,  // Track one hand at a time
-            modelComplexity: 1, // Simplified model for faster detection
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
+        // Add an event listener for the 'click' event on the box
+        box.addEventListener('click', function() {
+            // Change the box color to blue when clicked
+            this.setAttribute('color', 'blue');
         });
-
-        // Detect hand and trigger 3D object appearance
-        handTracking.onResults((results) => {
-            const handEntity = document.querySelector("#hand-entity");
-            if (results.multiHandLandmarks.length > 0) {
-                // Hand is detected, make the object visible
-                handEntity.setAttribute("visible", "true");
-                const handPosition = results.multiHandLandmarks[0][9]; // Index of wrist landmark
-                handEntity.setAttribute("position", `${handPosition.x} ${handPosition.y} -1`);
-            } else {
-                // No hand detected, hide the object
-                handEntity.setAttribute("visible", "false");
-            }
-        });
-
-        // Start MediaPipe Hand Tracking
-        const videoElement = document.createElement("video");
-        videoElement.width = 640;
-        videoElement.height = 480;
-        videoElement.style.position = "absolute";
-        videoElement.style.top = "0";
-        videoElement.style.left = "0";
-        document.body.appendChild(videoElement);
-
-        const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                await handTracking.send({ image: videoElement });
-            },
-        });
-        camera.start();
     </script>
 
 </body>
